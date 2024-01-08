@@ -1,4 +1,22 @@
 #!/usr/bin/env python3
+
+# DNS TOOL TO SYNC DNS RECORDS TO BUNNYCDN
+# Github repo: https://github.com/remarkablecloud/sync-dns-to-bunnycdn
+# Description: Sync zones and dns recors from local DNS server to BunnyCDN DNS Service
+# Version:     1.0
+# Author:      RemarkableCloud
+# Author URI:  https://remarkablecloud.com/
+# License:      GPLv3
+# License URI:  https://www.gnu.org/licenses/gpl-3.0.html
+# Requires:    Python 3.6 or higher
+# Requires:    dig (dnsutils)
+# Requires:    AXFR zone transfer enabled on source DNS server
+# Usage: 
+#  Add Zone:             python3 bunny-dns.py -add-zone example.com
+#  Get Zone id:          python3 bunny-dns.py -get-zone-id example.com
+#  Delete Zone:          python3 bunny-dns.py -delete-zone example.com
+#  Sync Zone Records:    python3 bunny-dns.py -sync-zone example.com
+
 # Import modules
 import sys
 import os
