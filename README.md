@@ -23,7 +23,7 @@ To customize the tool for your environment, create a configuration file named `b
 ```ini
 # /etc/bunny-dns-sync.conf
 
-[BunnyCDN]
+ # Config
 api_key = YOUR_BUNNYCDN_API_KEY
 base_url = https://api.bunny.net/dns
 
