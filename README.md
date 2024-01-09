@@ -17,7 +17,7 @@ This project is licensed under the [GNU General Public License v3.0](https://www
 - `dig` (dnsutils)
 - AXFR zone transfer enabled on the source DNS server
 
-## Todo
+## To-Do
 - Whitelist Domain (zones that must be ignored in add/sync/delete)
 - Support for BunnyCDN Custom Nameservers and contact email (BunnyCDN doesn't support SOA records)
 
