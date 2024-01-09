@@ -68,8 +68,11 @@ def read_config(config_file):
             config[key.strip()] = val.strip().strip("'")
     return config
 
+# Load the configuration
 config = read_config(config_file)
-#print(config)
+# Load the excluded zones from the file specified in the configuration
+with open(config['exclude_file'], 'r') as f:
+    exclude_zones = [line.strip() for line in f]
 
 # Function to add a zone
 def add_zone(zone_name):
@@ -123,7 +126,6 @@ def get_zone_id(zone_name):
 # Function to delete a zone
 def delete_zone(zone_name):
     """Delete a zone from BunnyCDN DNS Service"""
-    #zone_id = get_zone_id(zone_name)
     if zone_id:
         api_key = config['api_key']
         api_url = config['api_url']
@@ -209,7 +211,7 @@ def get_remote_dns_records(zone_name):
                 remote_record = {
                     'Id': record['Id'],
                     'Name': record['Name'],
-                    'Ttl': record.get('Ttl', 0),  # Provide a default value if 'TTL' does not exist
+                    'Ttl': record.get('Ttl', 300),  # Provide a default value if 'TTL' does not exist
                     'Type': record['Type'],
                 }
                 # Include additional fields for MX and SRV records
@@ -292,6 +294,41 @@ def sync_dns_records(zone_id, records_to_add, records_to_delete):
             print('Status code: {}'.format(response.status_code))
             print('Response: {}'.format(response.text))
 
+# Function to set custom nameservers and soa email address
+
+def update_soa_records(zone_id, records):
+    print(f"Records at the start of the function: {records}")
+    api_key = config['api_key']
+    api_url = config['api_url']
+    nameservers = []
+    soa_email = None
+    for record in records:
+        if record['Type'] == 12 and len(nameservers) < 2:
+            nameservers.append(record['Value'])
+        elif record['Type'] == 99:
+            soa_email = record['Value'].split()[0].replace('.', '@', 1)
+    print(f"Nameservers: {nameservers}")
+    print(f"SOA Email: {soa_email}")
+    if len(nameservers) == 2 and soa_email is not None:
+        print("Sending POST request...")
+        # ... rest of the function ...
+        data = {
+            "CustomNameserversEnabled": True,
+            "Nameserver1": nameservers[0],
+            "Nameserver2": nameservers[1],
+            "SoaEmail": soa_email
+        }
+        headers = {
+            'accept': 'application/json',
+            'content-type': 'application/json',
+            'AccessKey': api_key
+        }
+        response = requests.post(f"{api_url}/dnszone/{zone_id}", headers=headers, json=data)
+        if response.status_code == 200:
+            print("SOA records updated successfully.")
+        else:
+            print(f"Failed to update SOA records. Error: {response.text}")
+        return response.json()
 
 # MAIN CODE
     
@@ -305,12 +342,16 @@ args = parser.parse_args()
 
 # Check if -add-zone argument is provided
 if args.add_zone:
+    if args.add_zone in exclude_zones:
+        sys.exit(f"Error: {args.add_zone} is in the exclude list. Exiting...")
     add_zone(args.add_zone)
     zone_id = get_zone_id(args.add_zone)
     local_records = get_local_dns_records(args.add_zone)
     remote_records = get_remote_dns_records(args.add_zone)
     records_to_add, records_to_delete = compare_records(local_records, remote_records)
+    update_soa_records(zone_id, local_records)
     sync_dns_records(zone_id, records_to_add, records_to_delete)
+    
 
 # Check if -get-zone-id argument is provided
 if args.get_zone_id:
@@ -318,14 +359,22 @@ if args.get_zone_id:
 
 # Check if -delete-zone argument is provided
 if args.delete_zone:
+    if args.delete_zone in exclude_zones:
+        sys.exit(f"Error: {args.delete_zone} is in the exclude list. Exiting...")
     zone_id = get_zone_id(args.delete_zone)
     delete_zone(args.delete_zone)
 
 # Check if -sync-zone argument is provided
 if args.sync_zone:
+     if args.sync_zone in exclude_zones:
+        sys.exit(f"Error: {args.sync_zone} is in the exclude list. Exiting...")
      zone_name = args.sync_zone
      zone_id = get_zone_id(args.sync_zone)
      local_records = get_local_dns_records(zone_name)
      remote_records = get_remote_dns_records(zone_name)
      records_to_add, records_to_delete = compare_records(local_records, remote_records)
+     print("Before calling update_soa_records")
+     update_soa_records(zone_id, local_records)
+     print("After calling update_soa_records")
      sync_dns_records(zone_id, records_to_add, records_to_delete)
+     
