@@ -297,7 +297,6 @@ def sync_dns_records(zone_id, records_to_add, records_to_delete):
 # Function to set custom nameservers and soa email address
 
 def update_soa_records(zone_id, records):
-    print(f"Records at the start of the function: {records}")
     api_key = config['api_key']
     api_url = config['api_url']
     nameservers = []
@@ -307,11 +306,8 @@ def update_soa_records(zone_id, records):
             nameservers.append(record['Value'])
         elif record['Type'] == 99:
             soa_email = record['Value'].split()[0].replace('.', '@', 1)
-    print(f"Nameservers: {nameservers}")
-    print(f"SOA Email: {soa_email}")
+    
     if len(nameservers) == 2 and soa_email is not None:
-        print("Sending POST request...")
-        # ... rest of the function ...
         data = {
             "CustomNameserversEnabled": True,
             "Nameserver1": nameservers[0],
