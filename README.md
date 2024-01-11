@@ -53,7 +53,7 @@ sudo chmod +x /usr/local/bin/zone-change-detector.py
 ```
 ## Edit the configuration file to add your BunnyCDN Key and the source of your dns zones
  ```bash
-sudo nano etc/bunny-dns-sync.conf
+sudo nano /etc/bunny-dns-sync.conf
 ```
 ## Optional: Add domains to the exclude list
  ```bash
