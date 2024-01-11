@@ -2,6 +2,7 @@
 
 ## Description
 This script is a DNS tool that synchronizes zones and DNS records from a local DNS server to BunnyCDN DNS Service. It lets you easily manage and update your DNS records on BunnyCDN by leveraging AXFR zone transfer from your source DNS server.
+For now, only works with Bind and PowerDNS bind backend because it uses zone files to detect zone changes
 
 ## Version
 1.0
@@ -20,6 +21,7 @@ This project is licensed under the [GNU General Public License v3.0](https://www
 ## To-Do
 - [X] Whitelist Domain (zones that must be ignored in add/sync/delete)
 - [X] Support for BunnyCDN Custom Nameservers and contact email (BunnyCDN doesn't support SOA records)
+- [ ] Support for CNAME flattening records
 
 # How to Install
 
