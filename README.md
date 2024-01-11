@@ -21,22 +21,58 @@ This project is licensed under the [GNU General Public License v3.0](https://www
 - [X] Whitelist Domain (zones that must be ignored in add/sync/delete)
 - [X] Support for BunnyCDN Custom Nameservers and contact email (BunnyCDN doesn't support SOA records)
 
-## Configuration
-To customize the tool for your environment, create a configuration file named `bunny-dns-sync.conf` in the `/etc/` directory. You can use the provided [sample configuration file](/etc/bunny-dns-sync.conf) as a template.
+# How to Install
 
-```ini
-# /etc/bunny-dns-sync.conf
+## Clone the repository
+```bash
+git clone https://github.com/remarkablecloud/sync-dns-to-bunnycdn.git
 ```
-```ini
- # Config
-api_key = YOUR_BUNNYCDN_API_KEY
-api_url = https://api.bunny.net
-exclude_file = /etc/bunny-dns-sync-exclude.txt
 
+## Navigate to the repository directory
+```bash
+cd sync-dns-to-bunnycdn
 ```
-Make sure to replace YOUR_BUNNYCDN_API_KEY with your actual BunnyCDN API key.
+## Copy the configuration file to /etc (using sudo for permissions)
+```bash
+sudo cp config/bunny-dns-sync.conf /etc/bunny-dns-sync.conf
+sudo cp config/bunny-dns-sync-exclude.txt /etc/bunny-dns-sync-exclude.txt
+```
 
-Usage:
+## Copy scripts to /usr/local/bin
+
+```bash
+sudo cp scripts/bunny-dns.py /usr/local/bin/bunny-dns.py
+sudo cp scripts/zone-change-detector.py /usr/local/bin/zone-change-detector.py
+```
+
+## Set executable permissions
+
+```bash
+sudo chmod +x /usr/local/bin/bunny-dns.py
+sudo chmod +x /usr/local/bin/zone-change-detector.py
+```
+## Edit the configuration file to add your BunnyCDN Key and the source of your dns zones
+ ```bash
+sudo nano etc/bunny-dns-sync.conf
+```
+## Optional: Add domains to the exclude list
+ ```bash
+sudo nano /etc/bunny-dns-sync
+```
+## Create a log file
+ ```bash
+sudo touch /var/log/bunny-dns.log
+```
+## Create a cron job like
+ ```bash
+* * * * * /usr/local/bin/zone-change-detector.py >> /var/log/bunny-dns.log
+```
+
+/usr/local/bin/zone-change-detector.py will monitor all your zones .db located in $zone_dir, if any zones are added, changed, or deleted, it will call /usr/local/bin/zone-change-detector.py to sync the changes
+
+
+# Manual Usage:
+
 #### Add Zone
 python3 bunny-dns.py -add-zone example.com
 
