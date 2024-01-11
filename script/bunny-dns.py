@@ -305,7 +305,7 @@ def update_soa_records(zone_id, records):
         if record['Type'] == 12 and len(nameservers) < 2:
             nameservers.append(record['Value'])
         elif record['Type'] == 99:
-            soa_email = record['Value'].split()[0].replace('.', '@', 1)
+            soa_email = record['Value'].split()[1].replace('.', '@', 1)
     
     if len(nameservers) == 2 and soa_email is not None:
         data = {
@@ -369,8 +369,6 @@ if args.sync_zone:
      local_records = get_local_dns_records(zone_name)
      remote_records = get_remote_dns_records(zone_name)
      records_to_add, records_to_delete = compare_records(local_records, remote_records)
-     print("Before calling update_soa_records")
      update_soa_records(zone_id, local_records)
-     print("After calling update_soa_records")
      sync_dns_records(zone_id, records_to_add, records_to_delete)
      
