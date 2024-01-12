@@ -3,6 +3,17 @@ import os
 import hashlib
 import configparser
 
+# Set the lock file
+lock_file = '/tmp/zone-change-detector.lock'
+
+# Check if lock file exists
+if os.path.isfile(lock_file):
+    print("Another instance of the script is running. Exiting.")
+    exit()
+
+# Create lock file
+open(lock_file, 'a').close()
+
 # Set the zone directory
 config_file = '/etc/bunny-dns-sync.conf'
 config = configparser.ConfigParser()
@@ -52,3 +63,5 @@ with open(dns_zone_hashes_file, 'w') as f:
             f.write(f"{zone_name}:{zone_hash}\n")
         else:
             os.system(command_for_removed_zone % zone_name)
+# Remove lock file
+os.remove(lock_file)            

@@ -20,6 +20,8 @@ This project is licensed under the [GNU General Public License v3.0](https://www
 ## To-Do
 - [X] Whitelist Domain (zones that must be ignored in add/sync/delete)
 - [X] Support for BunnyCDN Custom Nameservers and contact email (BunnyCDN doesn't support SOA records)
+- [x] Avoid to run more than one instance
+
 
 # How to Install
 
