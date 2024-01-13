@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 import os
 import hashlib
-import configparser
 
 # Set the lock file
 lock_file = '/tmp/zone-change-detector.lock'
@@ -13,19 +12,34 @@ if os.path.isfile(lock_file):
 
 # Create lock file
 open(lock_file, 'a').close()
-
-# Set the zone directory
+# Global variables
 config_file = '/etc/bunny-dns-sync.conf'
-config = configparser.ConfigParser()
-config.read(config_file)
+config = {}
 
-zone_dir = config.get('DEFAULT', 'zone_dir')
+# Function to read config file
+def read_config(config_file):
+    """Read config file and return a dictionary with the config parameters"""
+    config = {}
+    with open(config_file) as f:
+        for line in f:
+            if line.startswith('Config'):
+                continue
+            if line.startswith('#'):
+                continue
+            if line.strip() == '':
+                continue
+            (key, val) = line.split('=')
+            config[key.strip()] = val.strip().strip("'")
+    return config
+
+config = read_config(config_file)
+zone_dir = config['zone_dir']
 dns_zone_hashes_file = "/tmp/dns_zone_hashes.txt"
 
 # Commands for add, update, and remove
-command_for_updated_zone = "/usr/local/bin/bunn-dns.py %s"
-command_for_added_zone = "/usr/local/bin/bunn-dns.py %s"
-command_for_removed_zone = "/usr/local/bin/bunn-dns.py %s"
+command_for_updated_zone = "/usr/local/bin/bunny-dns.py -sync-zone %s"
+command_for_added_zone = "/usr/local/bin/bunny-dns.py -add-zone %s"
+command_for_removed_zone = "/usr/local/bin/bunny-dns.py -delete-zone %s"
 
 # read dns_zone_hashes_file and get the zone name and hash
 # the format is zone_name:zone_hash
